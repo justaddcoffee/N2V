@@ -6,7 +6,7 @@ from sklearn.ensemble import RandomForestClassifier
 
 from sklearn import svm
 from sklearn.metrics import roc_auc_score, average_precision_score
-#import logging
+import logging
 #import os
 
 
@@ -161,32 +161,38 @@ class LinkPrediction:
         for edge in edge_list:
             node1 = edge[0]
             node2 = edge[1]
-            emb1 = node2vector_map[node1]
-            emb2 = node2vector_map[node2]
-            if edge_embedding_method == "hadamard":
-                # Perform a Hadamard transform on the node embeddings.
-                # This is a dot product of the node embedding for the two nodes that
-                # belong to each edge
-                edge_emb = np.multiply(emb1, emb2)
-            elif edge_embedding_method == "average":
-                # Perform a Average transform on the node embeddings.
-                # This is a elementwise average of the node embedding for the two nodes that
-                # belong to each edge
-                edge_emb = np.add(emb1, emb2) / 2
-            elif edge_embedding_method == "weightedL1":
-                # Perform weightedL1 transform on the node embeddings.
-                # WeightedL1 calculates the absolute value of difference of each element of the two nodes that
-                # belong to each edge
-                edge_emb = abs(emb1 - emb2)
-            elif edge_embedding_method == "weightedL2":
-                # Perform weightedL2 transform on the node embeddings.
-                # WeightedL2 calculates the square of difference of each element of the two nodes that
-                # belong to each edge
-                edge_emb = np.power((emb1 - emb2), 2)
+            if node1 in node2vector_map and node2 in node2vector_map:
+                emb1 = node2vector_map[node1]
+                emb2 = node2vector_map[node2]
+                if edge_embedding_method == "hadamard":
+                    # Perform a Hadamard transform on the node embeddings.
+                    # This is a dot product of the node embedding for the two nodes that
+                    # belong to each edge
+                    edge_emb = np.multiply(emb1, emb2)
+                elif edge_embedding_method == "average":
+                    # Perform a Average transform on the node embeddings.
+                    # This is a elementwise average of the node embedding for the two nodes that
+                    # belong to each edge
+                    edge_emb = np.add(emb1, emb2) / 2
+                elif edge_embedding_method == "weightedL1":
+                    # Perform weightedL1 transform on the node embeddings.
+                    # WeightedL1 calculates the absolute value of difference of each element of the two nodes that
+                    # belong to each edge
+                    edge_emb = abs(emb1 - emb2)
+                elif edge_embedding_method == "weightedL2":
+                    # Perform weightedL2 transform on the node embeddings.
+                    # WeightedL2 calculates the square of difference of each element of the two nodes that
+                    # belong to each edge
+                    edge_emb = np.power((emb1 - emb2), 2)
+                else:
+                    print("[ERROR]You need to enter hadamard, average, weightedL1, weightedL2")
+                    sys.exit(1)
+                embs.append(edge_emb)
             else:
-                print("[ERROR]You need to enter hadamard, average, weightedL1, weightedL2")
-                sys.exit(1)
-            embs.append(edge_emb)
+                if not node1 in node2vector_map:
+                    logging.error("can't find embeddings for %s", node1)
+                if not node2 in node2vector_map:
+                    logging.error("can't find embeddings for %s", node2)
         embs = np.array(embs)
         return embs
 
