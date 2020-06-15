@@ -81,13 +81,16 @@ class GraphFactory:
             Whetever to node files has a header or not.
         start_nodes_column: str = "subject",
             Column to use for the starting nodes. When no header is available,
-            use the numeric index curresponding to the column.
+            use the numeric index corresponding to the column.
         end_nodes_column: str = "object",
             Column to use for the ending nodes. When no header is available,
-            use the numeric index curresponding to the column.
+            use the numeric index corresponding to the column.
         node_types_column: str = "category",
             Column to use for the nodes type. When no header is available,
-            use the numeric index curresponding to the column.
+            use the numeric index corresponding to the column.
+        edge_types_column: str = "edge_label",
+            Column to use for the edges type. When no header is available,
+            use the numeric index corresponding to the column.
         directed_column: str = "is_directed",
             Column to use for the directionality of each edge. When no header is
             avaliable, it assumes non-directed.
@@ -152,9 +155,9 @@ class GraphFactory:
                 if column is not None and column in tmp_edges_df.columns
             ],
             dtype={
-                start_nodes_column: "string",
-                end_nodes_column: "string",
-                edge_types_column: "string",
+                start_nodes_column: np.dtype(str),
+                end_nodes_column: np.dtype(str),
+                edge_types_column: np.dtype(str),
                 weights_column: np.float32,
                 directed_column: np.bool
             },
@@ -191,8 +194,8 @@ class GraphFactory:
                     if column is not None and column in tmp_nodes_df.columns
                 ],
                 dtype={
-                    nodes_columns: "string",
-                    node_types_column: "string"
+                    nodes_columns: np.dtype(str),
+                    node_types_column: np.dtype(str)
                 },
                 header=(0 if node_file_has_header else None)
             )
@@ -218,7 +221,7 @@ class GraphFactory:
 
         else:
             nodes = unique_nodes
-        
+
         #######################################
         # Handling edge weights               #
         #######################################
